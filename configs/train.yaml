@@ -4,7 +4,7 @@
 experiment_name: deeplabv3plus_r50
 
 data:
-  root: C:\Users\KNH4ABT\github\datasets   # change to wherever you extracted Cityscapes
+  root: H:\datasets\cityscapes   # change to wherever you extracted Cityscapes
   num_classes: 19
   ignore_index: 255                 # void label, skipped in loss and metric
   crop_size: 384                    # 384 fits a 6 GB GPU (e.g. GTX 1660 Ti)
