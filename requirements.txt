@@ -1,0 +1,20 @@
+# --- core deep learning ---
+torch>=2.1
+torchvision>=0.16
+
+# --- modern transformer segmentation (SegFormer) ---
+transformers>=4.40
+
+# --- data / numerics ---
+numpy>=1.24
+Pillow>=10.0
+
+# --- config & CLI ---
+PyYAML>=6.0
+
+# --- progress / logging ---
+tqdm>=4.66
+tensorboard>=2.15
+
+# --- visualization ---
+matplotlib>=3.7

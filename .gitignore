@@ -1,0 +1,25 @@
+# ----- Python -----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+
+# ----- editors -----
+.vscode/
+.idea/
+
+# ----- training artifacts -----
+runs/
+checkpoints/
+*.pt
+*.pth
+
+# ----- data (NEVER commit Cityscapes — it's licensed) -----
+data/
+datasets/
+*.zip
+
+# ----- logs -----
+*.log
+events.out.tfevents.*

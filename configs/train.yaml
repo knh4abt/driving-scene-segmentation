@@ -1,0 +1,43 @@
+# Single source of truth for training hyperparameters.
+# Override fields from the CLI, e.g. `python scripts/train.py --model segformer_b0`.
+
+experiment_name: deeplabv3plus_r50
+
+data:
+  root: C:\Users\KNH4ABT\github\datasets   # change to wherever you extracted Cityscapes
+  num_classes: 19
+  ignore_index: 255                 # void label, skipped in loss and metric
+  crop_size: 384                    # 384 fits a 6 GB GPU (e.g. GTX 1660 Ti)
+  scale_range: [0.5, 2.0]           # multi-scale jitter for training
+  num_workers: 2
+
+model:
+  name: deeplabv3plus_r50           # or: segformer_b0
+  pretrained_backbone: true
+
+train:
+  epochs: 100
+  batch_size: 4                     # paired with the 384 crop for ~5 GB VRAM
+  amp: true                         # mixed precision (memory saving on Turing)
+
+# Two optimizer recipes, picked automatically based on model.name.
+# LR roughly halved vs the published values because we halved the batch size.
+optim:
+  deeplab:
+    type: sgd
+    lr: 0.005
+    momentum: 0.9
+    weight_decay: 1.0e-4
+  segformer:
+    type: adamw
+    lr: 3.0e-5
+    weight_decay: 1.0e-2
+    warmup_iters: 1500
+  poly_power: 0.9                   # lr *= (1 - iter / total)^power
+
+eval:
+  batch_size: 1                     # full-resolution eval at 1024 x 2048
+
+log:
+  out_dir: runs                     # runs/<experiment_name>/...
+  save_every_epochs: 10
