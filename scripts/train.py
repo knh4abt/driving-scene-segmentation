@@ -24,7 +24,7 @@ from src.dataset import IGNORE_INDEX, NUM_CLASSES, Cityscapes
 from src.metrics import ConfusionMatrixMeter
 from src.models import build_model
 from src.transforms import EvalTransform, TrainTransform
-from src.utils import poly_lr, save_checkpoint, set_seed
+from src.utils import load_checkpoint, poly_lr, save_checkpoint, set_seed
 
 
 def parse_args():
@@ -130,8 +130,8 @@ def main():
     # Optionally resume from last.pt. Restores model, optimizer, AMP scaler,
     # epoch counter, global iter and best mIoU so training continues seamlessly.
     last_ckpt = out_dir / "last.pt"
-    if args.resume and last_ckpt.exists():
-        ckpt = torch.load(last_ckpt, map_location=device)
+    if args.resume and (last_ckpt.exists() or last_ckpt.with_suffix(".pt.prev").exists()):
+        ckpt = load_checkpoint(last_ckpt, map_location=device)
         model.load_state_dict(ckpt["model_state"])
         optimizer.load_state_dict(ckpt["optim_state"])
         scaler.load_state_dict(ckpt["scaler_state"])

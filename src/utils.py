@@ -53,12 +53,58 @@ def set_seed(seed: int) -> None:
 
 
 def save_checkpoint(path: str | os.PathLike, state: dict) -> None:
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    torch.save(state, path)
+    """Atomically save `state` to `path`, keeping the prior file as `<path>.prev`.
+
+    Sequence:
+      1. Write to `<path>.tmp` and fsync to flush bytes to disk.
+      2. Rotate the current `<path>` to `<path>.prev` (skipped if first save).
+      3. Atomically rename `<path>.tmp` -> `<path>`.
+
+    `os.replace` is atomic on Windows and POSIX, so `<path>` itself is never
+    partially written. A crash between steps 2 and 3 leaves `<path>.prev` and
+    `<path>.tmp` on disk; `load_checkpoint` recovers from that state.
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    prev = path.with_suffix(path.suffix + ".prev")
+
+    with open(tmp, "wb") as f:
+        torch.save(state, f)
+        f.flush()
+        os.fsync(f.fileno())
+
+    if path.exists():
+        os.replace(path, prev)
+    os.replace(tmp, path)
 
 
 def load_checkpoint(path: str | os.PathLike, map_location="cpu") -> dict:
-    return torch.load(path, map_location=map_location)
+    """Load `path`, falling back to `<path>.prev` if `<path>` is missing or corrupt.
+
+    Recovers from a crash that hit between the two renames inside
+    `save_checkpoint`. If a complete `<path>.tmp` is present, promote it so
+    later loads see the newest good state.
+    """
+    path = Path(path)
+    prev = path.with_suffix(path.suffix + ".prev")
+    tmp = path.with_suffix(path.suffix + ".tmp")
+
+    try:
+        return torch.load(path, map_location=map_location)
+    except (FileNotFoundError, RuntimeError, EOFError) as e:
+        if tmp.exists():
+            try:
+                state = torch.load(tmp, map_location=map_location)
+                os.replace(tmp, path)
+                print(f"[recovery] promoted {tmp.name} -> {path.name} after crash mid-save")
+                return state
+            except (RuntimeError, EOFError):
+                pass
+        if prev.exists():
+            print(f"[recovery] loading {prev.name} ({path.name} unreadable: {e.__class__.__name__})")
+            return torch.load(prev, map_location=map_location)
+        raise
 
 
 def poly_lr(base_lr: float, cur_iter: int, total_iters: int, power: float = 0.9) -> float:
