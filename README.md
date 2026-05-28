@@ -47,24 +47,22 @@ Failure-case galleries: [`docs/results/failures_deeplab/`](docs/results/failures
 
 ## Reproduce
 
+Cityscapes requires registration: https://www.cityscapes-dataset.com/. Download
+`leftImg8bit_trainvaltest.zip` + `gtFine_trainvaltest.zip`, extract both into
+one folder, then set `data.root` in `configs/train.yaml`.
+
 ```bash
-conda create -n dss python=3.10 -y && conda activate dss
 pip install -r requirements.txt
-# point configs/train.yaml:data.root at your local Cityscapes folder
 
 # Train (each takes 4-7 hours on a single 12 GB GPU)
 python scripts/train.py --config configs/train.yaml --seed 42
 python scripts/train.py --config configs/train.yaml --model segformer_b0 --seed 42
 
 # Evaluate + analyze
-python scripts/evaluate.py         --checkpoint runs/deeplabv3plus_r50/best.pt --out-json docs/results/deeplab_eval.json
-python scripts/analyze_confusion.py --checkpoint runs/deeplabv3plus_r50/best.pt --out-png docs/results/confusion_deeplab.png
+python scripts/evaluate.py          --checkpoint runs/deeplabv3plus_r50/best.pt --out-json docs/results/deeplab_eval.json
+python scripts/analyze_confusion.py --checkpoint runs/deeplabv3plus_r50/best.pt --out-png  docs/results/confusion_deeplab.png
 python scripts/failure_gallery.py   --checkpoint runs/deeplabv3plus_r50/best.pt --num-samples 8 --out-dir docs/results/failures_deeplab
 ```
-
-Cityscapes requires registration: https://www.cityscapes-dataset.com/.
-Download `leftImg8bit_trainvaltest.zip` + `gtFine_trainvaltest.zip`, extract
-both into one folder, and point `configs/train.yaml:data.root` at it.
 
 ## Limitations
 
