@@ -107,6 +107,16 @@ def load_checkpoint(path: str | os.PathLike, map_location="cpu") -> dict:
         raise
 
 
-def poly_lr(base_lr: float, cur_iter: int, total_iters: int, power: float = 0.9) -> float:
-    """lr(t) = base_lr * (1 - t / total)^power."""
-    return base_lr * (1.0 - cur_iter / max(total_iters, 1)) ** power
+def poly_lr(base_lr: float, cur_iter: int, total_iters: int, power: float = 0.9,
+            warmup_iters: int = 0) -> float:
+    """Linear warmup for `warmup_iters`, then polynomial decay over the rest.
+
+    `warmup_iters=0` (default) recovers pure poly decay, matching the recipe
+    used by DeepLab/SGD. SegFormer/AdamW needs warmup to avoid the freshly
+    initialized decode head collapsing into a degenerate dominant-class basin.
+    """
+    if warmup_iters > 0 and cur_iter < warmup_iters:
+        return base_lr * (cur_iter + 1) / warmup_iters
+    decay_iter = cur_iter - warmup_iters
+    decay_total = max(total_iters - warmup_iters, 1)
+    return base_lr * (1.0 - decay_iter / decay_total) ** power
