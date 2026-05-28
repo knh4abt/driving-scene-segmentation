@@ -124,6 +124,13 @@ def main():
     total_iters = epochs * iters_per_epoch
 
     use_amp = bool(cfg["train"]["amp"]) and device.type == "cuda"
+    # SegFormer's decode_head BatchNorm is fragile under fp16 in our small-batch
+    # setup: a single fp16 overflow during the forward pass poisons BN's running
+    # stats (running_mean/var go NaN), permanently breaking eval-mode inference.
+    # DeepLab's BN handles AMP without issues, so we only disable AMP here.
+    if "segformer" in model_name_lc or "mit" in model_name_lc:
+        use_amp = False
+        print("[setup] AMP disabled for SegFormer (BN running-stat stability)")
     scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
 
     out_dir = Path(cfg["log"]["out_dir"]) / cfg["experiment_name"]
