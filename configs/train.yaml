@@ -30,9 +30,9 @@ optim:
     weight_decay: 1.0e-4
   segformer:
     type: adamw
-    lr: 3.0e-5
+    lr: 6.0e-5                      # published recipe; AdamW is batch-size invariant, no halving
     weight_decay: 1.0e-2
-    warmup_iters: 1500
+    warmup_iters: 1500              # linear warmup, applied by poly_lr
   poly_power: 0.9                   # lr *= (1 - iter / total)^power
 
 eval:

@@ -112,6 +112,11 @@ def main():
     ).to(device)
     optimizer, base_lr = build_optimizer(model, cfg["model"]["name"], cfg["optim"])
     poly_power = cfg["optim"]["poly_power"]
+    model_name_lc = cfg["model"]["name"].lower()
+    if "segformer" in model_name_lc or "mit" in model_name_lc:
+        warmup_iters = int(cfg["optim"]["segformer"].get("warmup_iters", 0))
+    else:
+        warmup_iters = 0
     criterion = nn.CrossEntropyLoss(ignore_index=cfg["data"]["ignore_index"])
 
     epochs = cfg["train"]["epochs"]
@@ -147,7 +152,7 @@ def main():
             image = image.to(device, non_blocking=True)
             target = target.to(device, non_blocking=True)
 
-            lr = poly_lr(base_lr, global_iter, total_iters, poly_power)
+            lr = poly_lr(base_lr, global_iter, total_iters, poly_power, warmup_iters=warmup_iters)
             for pg in optimizer.param_groups:
                 pg["lr"] = lr
 
