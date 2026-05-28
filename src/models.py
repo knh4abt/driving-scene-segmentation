@@ -69,6 +69,7 @@ def build_model(name: str, num_classes: int = 19, pretrained: bool = True) -> nn
                 "nvidia/mit-b0",
                 num_labels=num_classes,
                 ignore_mismatched_sizes=True,  # head reinit for 19 classes
+                use_safetensors=True,          # skip .bin (needs torch>=2.6 since CVE-2025-32434)
             )
         else:
             from transformers import SegformerConfig
