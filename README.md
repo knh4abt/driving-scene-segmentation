@@ -1,5 +1,7 @@
 # Driving Scene Segmentation: How Small Is Too Small for ADAS?
 
+![Python](https://img.shields.io/badge/python-3.10-blue) ![PyTorch](https://img.shields.io/badge/PyTorch-2.x-ee4c2c) ![License](https://img.shields.io/badge/license-MIT-green)
+
 In an autonomous-driving stack, perception models eventually have to run on
 a tiny ECU in the car — not on a workstation. The practical question for
 that constraint is not "what is the highest mIoU possible." It is **"how
@@ -8,6 +10,10 @@ small can the model get before its failure modes become unsafe to ship?"**
 This project measures that trade-off concretely for driving-scene
 segmentation: two architectures, identical training constraints, an
 honest comparison of where each one breaks.
+
+Built with PyTorch and HuggingFace Transformers.
+
+---
 
 ## TL;DR
 
@@ -20,6 +26,8 @@ Same dataset (Cityscapes, fine), same seed (42), 100 epochs each, on a
 single 12 GB consumer GPU. The 10x parameter reduction trades 12.8 mIoU
 points overall — but the trade is **uneven** in a way that matters for
 deployment.
+
+---
 
 ## The actual finding
 
@@ -45,6 +53,8 @@ Full per-class table and confusion analysis: [`docs/results.md`](docs/results.md
 Failure-case galleries: [`docs/results/failures_deeplab/`](docs/results/failures_deeplab/),
 [`docs/results/failures_segformer/`](docs/results/failures_segformer/).
 
+---
+
 ## Reproduce
 
 Cityscapes requires registration: https://www.cityscapes-dataset.com/. Download
@@ -64,6 +74,8 @@ python scripts/analyze_confusion.py --checkpoint runs/deeplabv3plus_r50/best.pt 
 python scripts/failure_gallery.py   --checkpoint runs/deeplabv3plus_r50/best.pt --num-samples 8 --out-dir docs/results/failures_deeplab
 ```
 
+---
+
 ## Limitations
 
 This is a one-engineer reproduction on a 12 GB consumer GPU, not a paper run.
@@ -82,6 +94,8 @@ those constraints:
 
 A non-trivial training bug worth reading separately (AMP / BatchNorm /
 SegFormer interaction): [`docs/debug-notes.md`](docs/debug-notes.md).
+
+---
 
 ## Takeaways
 
@@ -104,7 +118,9 @@ specific vehicle-discrimination weakness — fixable (larger crops,
 class-weighted loss, stepping up to SegFormer-B1), but not by
 parameter-count alone.
 
-## Repo layout
+---
+
+## Project Structure
 
 ```
 configs/train.yaml          single source of truth for hyperparameters
@@ -127,9 +143,17 @@ scripts/
   failure_gallery.py        worst-per-image-mIoU triptychs
 ```
 
+---
+
 ## References
 
 - Cordts et al., *The Cityscapes Dataset for Semantic Urban Scene Understanding*, CVPR 2016.
 - Chen et al., *Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation* (DeepLabV3+), ECCV 2018.
 - Xie et al., *SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers*, NeurIPS 2021.
 - Official Cityscapes scripts: https://github.com/mcordts/cityscapesScripts
+
+---
+
+## License
+
+MIT
