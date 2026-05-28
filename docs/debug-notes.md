@@ -7,7 +7,7 @@ deterministic, plausible-looking mIoU — and the cause is counter-intuitive.
 ## Symptom
 
 The first SegFormer-B0 training run reached **1.98% val mIoU at epoch 1
-and held it for 47 epochs**. No errors, no NaN warnings, no exceptions.
+and stayed there for 47 epochs**. No errors, no NaN warnings, no exceptions.
 tqdm progressed normally, training loss looked vaguely sensible.
 
 1.98% mIoU on 19 classes with `ignore_index=255` is exactly what you get
@@ -117,5 +117,5 @@ is the worst kind of bug — there is nothing to grep the logs for. The
 diagnostic step that finally pinned it: don't trust the metric, inspect
 the actual model output. `(logits.mean(), logits.std())` showed NaN in
 two seconds; `model.train()` vs `model.eval()` comparison pinned the
-issue to running statistics within thirty. Should have done this on
-epoch 1 of the first failed run rather than after epoch 47.
+issue to running statistics within thirty seconds. Should have done this
+on epoch 1 of the first failed run rather than after epoch 47.

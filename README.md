@@ -36,7 +36,8 @@ On the safety-critical rare ones it collapses — most starkly in
 | train → bus                |     0%  | **23%**   |
 
 A model that confuses a truck with a car 26% of the time is unshippable
-for ADAS: trucks brake, occupy lanes, and behave differently from cars.
+for ADAS: trucks have different braking distances, lane footprint, and
+trajectory from cars.
 The 10x-fewer-parameters savings come with that very specific cost in
 exactly the classes that matter for safety.
 
@@ -74,7 +75,7 @@ those constraints:
 - **Single seed (42).** Published recipes average over 3 seeds. I report
   the single-seed number honestly rather than cherry-pick.
 - **Reduced crop and batch:** 384×384 / batch 4 vs paper's 1024×1024 /
-  batch 8. Costs ~5 mIoU points overall, hits SegFormer harder
+  batch 8. Costs ~5 mIoU points overall and hits SegFormer harder
   (its attention starves on small crops).
 - **100 epochs vs paper's 200.** Both val-mIoU curves plateaued by ~epoch
   90, so the marginal gain from 200 epochs is small but not measured.
