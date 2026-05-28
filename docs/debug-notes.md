@@ -21,7 +21,7 @@ So the model had collapsed to predicting one class — the classic
   config had wrongly halved it on the SGD-style linear-scaling rule;
   AdamW is largely batch-size invariant.
 - **Implemented linear warmup.** The config had `warmup_iters: 1500` but
-  nothing in `train.py` read it. The freshly-initialised decode head
+  nothing in `train.py` read it. The freshly-initialized decode head
   needs a gentle ramp.
 
 Both fixes were correct in isolation. The model still hit exactly 1.98%.
@@ -51,7 +51,7 @@ Where the NaN came from:
 ```
 
 The BatchNorm running stats in the decode head are corrupt. In eval
-mode, BN normalises with `(x - running_mean) / sqrt(running_var)`.
+mode, BN normalizes with `(x - running_mean) / sqrt(running_var)`.
 Divide by NaN, get NaN.
 
 The cleanest diagnostic that confirmed it:

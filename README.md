@@ -56,7 +56,7 @@ pip install -r requirements.txt
 python scripts/train.py --config configs/train.yaml --seed 42
 python scripts/train.py --config configs/train.yaml --model segformer_b0 --seed 42
 
-# Evaluate + analyse
+# Evaluate + analyze
 python scripts/evaluate.py         --checkpoint runs/deeplabv3plus_r50/best.pt --out-json docs/results/deeplab_eval.json
 python scripts/analyze_confusion.py --checkpoint runs/deeplabv3plus_r50/best.pt --out-png docs/results/confusion_deeplab.png
 python scripts/failure_gallery.py   --checkpoint runs/deeplabv3plus_r50/best.pt --num-samples 8 --out-dir docs/results/failures_deeplab
