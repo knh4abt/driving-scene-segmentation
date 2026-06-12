@@ -79,7 +79,7 @@ python scripts/failure_gallery.py   --checkpoint runs/deeplabv3plus_r50/best.pt 
 ## Limitations
 
 This is a one-engineer reproduction on a 12 GB consumer GPU, not a paper run.
-The gap between our numbers and published numbers is the deliberate cost of
+The gap between my numbers and published numbers is the deliberate cost of
 those constraints:
 
 - **Single seed (42).** Published recipes average over 3 seeds. I report
